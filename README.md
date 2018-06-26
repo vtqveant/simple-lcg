@@ -80,4 +80,4 @@ parser is nonetheless quite efficient and much simpler than the original parser 
 
 ### License
 
-MIT Licence.
+MIT.
