@@ -8,6 +8,35 @@ It uses term graphs, a variant of proof nets, as its syntactic formalism. As com
 described in the thesis, this implementation is radically simplified and less efficient. 
 
 
+### Usage
+
+The main class to use is `ChartLCGParser`, which takes a sequent generated with a `SequentBuilder` from a textual 
+representation of the sequent. An output is a term graph serialized as JSON. 
+
+```json
+{
+    "sequent": {
+        "antecedent": "S",
+        "succedent": "S"
+    },
+    "frame": [
+        {"i": 0, "c": "S", "p": "-"},
+        {"i": 1, "c": "S", "p": "+"}
+    ],
+    "parses":[
+        {
+            "l":[
+                {"source": 1, "target": 0, "p": "linkage", "t": "regular"}
+            ]
+        }
+    ]
+}
+
+```
+
+A CLI runner will be provided soon. 
+
+
 ### Definitions, data structures and algorithms described in (Fowler 2016)
 
 I used basic defintions and data structures of term graphs, proof frame and syntactic categories decomposition, 
@@ -21,19 +50,22 @@ definitions with those used in the "parsing as deduction" literature.
 
 | LCG Parser                                             |   Parsing as deduction                 |
 |--------------------------------------------------------|----------------------------------------|
-| term graph, proof net, proof frame<sup>`*`</sup> with linkage  |   parse tree                           |
-| abstract proof frame (APF)<sup>`**`</sup>              |   --                                   |
+| term graph, proof net, proof frame`*` with linkage     |   parse tree                           |
+| abstract proof frame (APF)`**`                         |   --                                   |
 | partial term graph (PTG)                               |   subtree                              |
-| abstract term graph (ATG)<sup>`***`</sup>              |   item, e.g. `[A, i, j]`               |
+| abstract term graph (ATG)`***`                         |   item, e.g. `[A, i, j]`               |
 | span (a sublist of atomic syntactic categories)        |   span (a substring between i and j)   |
 | chart                                                  |   chart                                |
 
 Notes:
 
- <sup>`*`</sup>   a proof frame is precomputed and shared between all data structures, it is never modified\
- <sup>`**`</sup>   arguably, an Auxiliary Proof Frame would be a better name\
- <sup>`***`</sup> arguably, an Auxiliary Partial Proof Net (APPN) would be a better name\
- <sup>`#`</sup>   "concise representative ATG for a PTG" simply means "a minimized auxiliary partial proof net satisfying
+ `*`   a proof frame is precomputed and shared between all data structures, it is never modified
+ 
+ `**`   arguably, an Auxiliary Proof Frame would be a better name
+ 
+ `***` arguably, an Auxiliary Partial Proof Net (APPN) would be a better name
+ 
+ `#`   "concise representative ATG for a PTG" simply means "a minimized auxiliary partial proof net satisfying
  well-formedness conditions"
 
 
@@ -69,8 +101,8 @@ parser is nonetheless quite efficient and much simpler than the original parser 
 
 * In the `T(CT)` validation rule I had to add an additional requirement that `t` is regular reachable from `x`, 
   which seems compatible with the original LG-graphs definition from (Penn 2004). 
-* On p. 77, Fig. 3.14(b) a link between N2 and S4 is not eligible, should not the first category of the antecedent
-  rather be S1\(N2/N3) instead of S1/(N2/N3)?
+* On p. 77, Fig. 3.14(b) a link between `N2` and `S4` is not eligible, should not the first category of the antecedent
+  rather be `S1\(N2/N3)` instead of `S1/(N2/N3)`?
 * On p. 153 the categories of 'by' and of its parent in the trees are swapped.
 
 
