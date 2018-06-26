@@ -3,7 +3,7 @@
 
 ### Intro
 
-This is an implementation of a chart parser for bounded-order Lambek Categorial Grammar based on (Fowler, 2016).
+This is an implementation of a chart parser for bounded-order Lambek Categorial Grammar based on [(Fowler, 2016)](https://tspace.library.utoronto.ca/bitstream/1807/73006/1/Fowler_Timothy_A_201606_PhD_thesis.pdf).
 It uses term graphs, a variant of proof nets, as its syntactic formalism. As compared to the original parser 
 described in the thesis, this implementation is radically simplified and less efficient. 
 
