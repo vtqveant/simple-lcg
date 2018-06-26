@@ -15,8 +15,8 @@ described in the thesis, this implementation is radically simplified and less ef
 ### Definitions, data structures and algorithms described in (Fowler 2016)
 
 I used basic defintions and data structures of term graphs, proof frame and syntactic categories decomposition, 
-axiomatic linkage, L*- and L-integrity. Note that, contrary to Lambek calculus tradition, syntactic categories are 
-written using Steedman's notation and not that of Ajdukiewicz (i.e. we have reductions of the sort `B, A\B -> A`, 
+axiomatic linkage, L*- and L-integrity. Note that, contrary to the Lambek calculus tradition, syntactic categories are 
+written using Steedman's notation and not that of Ajdukiewicz (i.e. we have reductions of the sort `B, A\B -> A` 
 rather than `B, B\A -> A`). This is to comply with the term graph definition given in (Fowler 2016). However, 
 converting between the two notations is trivial, so I leave it as an exercise to the user.     
 
@@ -76,3 +76,8 @@ parser is nonetheless quite efficient and much simpler than the original parser 
 * On p. 77, Fig. 3.14(b) a link between N2 and S4 is not eligible, should not the first category of the antecedent
   rather be S1\(N2/N3) instead of S1/(N2/N3)?
 * On p. 153 the categories of 'by' and of its parent in the trees are swapped.
+
+
+### License
+
+MIT Licence.
