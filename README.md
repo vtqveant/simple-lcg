@@ -8,10 +8,6 @@ It uses term graphs, a variant of proof nets, as its syntactic formalism. As com
 described in the thesis, this implementation is radically simplified and less efficient. 
 
 
-### Basic notions
-
-
-
 ### Definitions, data structures and algorithms described in (Fowler 2016)
 
 I used basic defintions and data structures of term graphs, proof frame and syntactic categories decomposition, 
@@ -80,4 +76,4 @@ parser is nonetheless quite efficient and much simpler than the original parser 
 
 ### License
 
-MIT.
+MIT
