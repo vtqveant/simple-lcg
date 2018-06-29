@@ -4,7 +4,7 @@ import ru.eventflow.lcg.category.Category;
 import ru.eventflow.lcg.category.ComplexCategory;
 import ru.eventflow.lcg.category.Connective;
 import ru.eventflow.lcg.category.PrimitiveCategory;
-import ru.eventflow.lcg.sequent.Sequent;
+import ru.eventflow.lcg.parser.Sequent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,13 +79,13 @@ public class ProofFrameBuilder {
                 if (c.getConnective() == Connective.RIGHT_DIVISION) {           //   A/B (-)   =>  A- --> B+
                     Vertex a = new Vertex(c.getLeft(), Polarity.NEGATIVE);
                     Vertex b = new Vertex(c.getRight(), Polarity.POSITIVE);
-                    processEdges(linkage, vertex, a, b, Hyperedge.Type.REGULAR);
+                    processEdges(linkage, vertex, a, b, Edge.Type.REGULAR);
                     process(a, list, linkage);
                     process(b, list, linkage);
                 } else if (c.getConnective() == Connective.LEFT_DIVISION) {    //    A\B (-)   =>  B+ <-- A-
                     Vertex a = new Vertex(c.getLeft(), Polarity.NEGATIVE);
                     Vertex b = new Vertex(c.getRight(), Polarity.POSITIVE);
-                    processEdges(linkage, vertex, a, b, Hyperedge.Type.REGULAR);
+                    processEdges(linkage, vertex, a, b, Edge.Type.REGULAR);
                     process(b, list, linkage);
                     process(a, list, linkage);
                 } else {
@@ -95,13 +95,13 @@ public class ProofFrameBuilder {
                 if (c.getConnective() == Connective.RIGHT_DIVISION) {          //    A/B (+)   =>  B- <~~ A+
                     Vertex a = new Vertex(c.getLeft(), Polarity.POSITIVE);
                     Vertex b = new Vertex(c.getRight(), Polarity.NEGATIVE);
-                    processEdges(linkage, vertex, a, b, Hyperedge.Type.LAMBEK);
+                    processEdges(linkage, vertex, a, b, Edge.Type.LAMBEK);
                     process(b, list, linkage);
                     process(a, list, linkage);
                 } else if (c.getConnective() == Connective.LEFT_DIVISION) {    //    A\B (+)   =>  A+ ~~> B-
                     Vertex a = new Vertex(c.getLeft(), Polarity.POSITIVE);
                     Vertex b = new Vertex(c.getRight(), Polarity.NEGATIVE);
-                    processEdges(linkage, vertex, a, b, Hyperedge.Type.LAMBEK);
+                    processEdges(linkage, vertex, a, b, Edge.Type.LAMBEK);
                     process(a, list, linkage);
                     process(b, list, linkage);
                 } else {
@@ -113,14 +113,10 @@ public class ProofFrameBuilder {
         }
     }
 
-    private void processEdges(Linkage linkage, Vertex parent, Vertex a, Vertex b, Hyperedge.Type type) {
+    private void processEdges(Linkage linkage, Vertex parent, Vertex a, Vertex b, Edge.Type type) {
         linkage.addVertex(a);
         linkage.addVertex(b);
-        if (type == Hyperedge.Type.REGULAR) {
-            linkage.addRegularEdge(a, b, Hyperedge.Partition.FRAME);
-        } else {
-            linkage.addLambekEdge(Collections.singleton(a), b, Hyperedge.Partition.FRAME);
-        }
+        linkage.addEdge(a, b, Edge.Partition.FRAME, type);
         reattach(linkage, parent, a);
     }
 
@@ -128,27 +124,19 @@ public class ProofFrameBuilder {
      * The neighbourhood of the polarized category on the lhs of each rule is assigned to A
      */
     private void reattach(Linkage linkage, Vertex vertex, Vertex a) {
-        List<Hyperedge> removal = new ArrayList<>();
+        List<Edge> removal = new ArrayList<>();
 
-        for (Hyperedge e : linkage.getInEdges(vertex)) {
+        for (Edge e : linkage.getInEdges(vertex)) {
             removal.add(e);
-            if (e.getType() == Hyperedge.Type.REGULAR) {
-                linkage.addRegularEdge(e.getSource(), a, Hyperedge.Partition.FRAME);
-            } else {
-                linkage.addLambekEdge(e.getSourceSet(), a, Hyperedge.Partition.FRAME);
-            }
+            linkage.addEdge(e.getSource(), a, Edge.Partition.FRAME, e.getType());
         }
 
-        for (Hyperedge e : linkage.getOutEdges(vertex)) {
+        for (Edge e : linkage.getOutEdges(vertex)) {
             removal.add(e);
-            if (e.getType() == Hyperedge.Type.REGULAR) {
-                linkage.addRegularEdge(a, e.getTarget(), Hyperedge.Partition.FRAME);
-            } else {
-                linkage.addLambekEdge(Collections.singleton(a), e.getTarget(), Hyperedge.Partition.FRAME);
-            }
+            linkage.addEdge(a, e.getTarget(), Edge.Partition.FRAME, e.getType());
         }
 
-        for (Hyperedge e : removal) {
+        for (Edge e : removal) {
             linkage.removeEdge(e);
         }
     }

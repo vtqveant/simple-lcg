@@ -1,6 +1,6 @@
-package ru.eventflow.lcg.validate;
+package ru.eventflow.lcg.parser;
 
-import ru.eventflow.lcg.frame.Hyperedge;
+import ru.eventflow.lcg.frame.Edge;
 import ru.eventflow.lcg.frame.Linkage;
 import ru.eventflow.lcg.frame.Vertex;
 
@@ -16,13 +16,16 @@ public class RegularReachabilityDetector {
     private Map<Vertex, Set<Vertex>> index;
     private Set<Vertex> marked;
 
-    public RegularReachabilityDetector(Linkage linkage) {
+    public RegularReachabilityDetector(Linkage linkage, boolean verbose) {
         this.linkage = linkage;
         this.index = new HashMap<>();
         this.marked = new HashSet<>();
 
         buildIndex();
-        dumpIndex();
+
+        if (verbose) {
+            dumpIndex();
+        }
     }
 
     private void buildIndex() {
@@ -45,7 +48,7 @@ public class RegularReachabilityDetector {
             index.putIfAbsent(v, new HashSet<>());
             index.get(v).add(v);
 
-            for (Hyperedge outEdge : linkage.getOutEdges(v).stream().filter(Hyperedge::isRegular).collect(Collectors.toSet())) {
+            for (Edge outEdge : linkage.getOutEdges(v).stream().filter(Edge::isRegular).collect(Collectors.toSet())) {
                 Vertex successor = outEdge.getTarget();
 
                 processVertex(successor, copy);

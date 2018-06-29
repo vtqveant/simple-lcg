@@ -1,9 +1,9 @@
-package ru.eventflow.lcg.validate;
+package ru.eventflow.lcg.parser;
 
 import org.junit.Before;
 import org.junit.Test;
 import ru.eventflow.lcg.category.PrimitiveCategory;
-import ru.eventflow.lcg.frame.Hyperedge;
+import ru.eventflow.lcg.frame.Edge;
 import ru.eventflow.lcg.frame.Linkage;
 import ru.eventflow.lcg.frame.Polarity;
 import ru.eventflow.lcg.frame.Vertex;
@@ -37,12 +37,12 @@ public class AcyclicTest {
         linkage.addVertex(v1);
         linkage.addVertex(v2);
         linkage.addVertex(v3);
-        linkage.addRegularEdge(v3, v0, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v0, v2, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v2, v1, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v1, v3, Hyperedge.Partition.LINKAGE);
+        linkage.addEdge(v3, v0, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v0, v2, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v2, v1, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v1, v3, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
 
-        boolean acyclic = new LinkageValidator(linkage, false).isRegularAcyclic();
+        boolean acyclic = new Validator(linkage, true, false).isRegularAcyclic();
         assertFalse(acyclic);
     }
 
@@ -53,12 +53,12 @@ public class AcyclicTest {
         linkage.addVertex(v1);
         linkage.addVertex(v2);
         linkage.addVertex(v3);
-        linkage.addRegularEdge(v3, v0, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v0, v2, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v2, v1, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v3, v2, Hyperedge.Partition.LINKAGE);
+        linkage.addEdge(v3, v0, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v0, v2, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v2, v1, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v3, v2, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
 
-        boolean acyclic = new LinkageValidator(linkage, false).isRegularAcyclic();
+        boolean acyclic = new Validator(linkage, true, false).isRegularAcyclic();
         assertTrue(acyclic);
     }
 

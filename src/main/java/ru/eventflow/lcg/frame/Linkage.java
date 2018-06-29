@@ -1,6 +1,9 @@
 package ru.eventflow.lcg.frame;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -10,26 +13,18 @@ import java.util.stream.Collectors;
 public class Linkage {
 
     private Set<Vertex> vertices;
-    private Set<Hyperedge> edges;
+    private Set<Edge> edges;
 
     public Linkage() {
         vertices = new HashSet<>();
         edges = new HashSet<>();
     }
 
-    public void addLambekEdge(Set<Vertex> from, Vertex to, Hyperedge.Partition partition) {
-        if (findEdge(from, to, partition).size() == 0) {
-            vertices.add(to);
-            vertices.addAll(from);
-            edges.add(new Hyperedge(new HashSet<>(from), to, partition));
-        }
-    }
-
-    public void addRegularEdge(Vertex from, Vertex to, Hyperedge.Partition partition) {
+    public void addEdge(Vertex from, Vertex to, Edge.Partition partition, Edge.Type type) {
         if (findEdge(from, to, partition).size() == 0) {
             vertices.add(to);
             vertices.add(from);
-            edges.add(new Hyperedge(from, to, partition));
+            edges.add(new Edge(from, to, partition, type));
         }
     }
 
@@ -37,12 +32,12 @@ public class Linkage {
         vertices.add(vertex);
     }
 
-    public Set<Hyperedge> getRegularEdges() {
-        return edges.stream().filter(Hyperedge::isRegular).collect(Collectors.toSet());
+    public Set<Edge> getRegularEdges() {
+        return edges.stream().filter(Edge::isRegular).collect(Collectors.toSet());
     }
 
-    public Set<Hyperedge> getLambekEdges() {
-        return edges.stream().filter(Hyperedge::isLambek).collect(Collectors.toSet());
+    public Set<Edge> getLambekEdges() {
+        return edges.stream().filter(Edge::isLambek).collect(Collectors.toSet());
     }
 
     public boolean containsVertex(Vertex vertex) {
@@ -51,55 +46,25 @@ public class Linkage {
 
     public void removeVertex(Vertex vertex) {
         vertices.remove(vertex);
-        removeFromLambekSources(vertex);
     }
 
-    public void removeFromLambekSources(Vertex vertex) {
-        for (Hyperedge edge : edges) {
-            if (edge.isLambek()) {
-                edge.getSourceSet().remove(vertex);
-            }
-        }
-
-        // simply prune edges with empty sources
-        edges.removeIf(e -> e.getSourceSet().size() == 0);
-    }
-
-    public void removeRegularEdge(Vertex from, Vertex to) {
-        edges.removeIf(e -> e.isRegular() && e.getSource().equals(from) && e.getTarget().equals(to));
-    }
-
-    public void removeEdge(Hyperedge edge) {
+    public void removeEdge(Edge edge) {
         edges.remove(edge);
     }
 
-    public Set<Hyperedge> getInEdges(Vertex vertex) {
-        return edges.stream().filter(e -> e.getTarget().equals(vertex)).collect(Collectors.toSet());
+    public Set<Edge> getInEdges(Vertex vertex) {
+        return edges.stream().filter(e -> e.getTarget() == vertex).collect(Collectors.toSet());
     }
 
-    /**
-     * Given a PTG G and an atom a ∈ V(G), a is open iff a is positive and has no regular out-edge or a is negative and has no regular in-edge.
-     */
-    public boolean isOpen(Vertex vertex) {
-        if (vertex.getType() != Vertex.Type.ATOM) {
-            return false;
-        }
-        if (vertex.getPolarity() == Polarity.POSITIVE) {
-            return getOutEdges(vertex).stream().noneMatch(Hyperedge::isRegular);
-        } else {
-            return getInEdges(vertex).stream().noneMatch(Hyperedge::isRegular);
-        }
+    public Set<Edge> getOutEdges(Vertex vertex) {
+        return edges.stream().filter(e -> e.getSource() == vertex).collect(Collectors.toSet());
     }
 
-    public Set<Hyperedge> getOutEdges(Vertex vertex) {
-        return edges.stream().filter(e -> e.getSourceSet().contains(vertex)).collect(Collectors.toSet());
-    }
-
-    public Set<Vertex> getPredecessors(Vertex vertex, Hyperedge.Type edgeType) {
+    public Set<Vertex> getPredecessors(Vertex vertex, Edge.Type edgeType) {
         Set<Vertex> predecessors = new HashSet<>();
-        for (Hyperedge edge : getInEdges(vertex)) {
+        for (Edge edge : getInEdges(vertex)) {
             if (edge.getType() == edgeType) {
-                predecessors.addAll(edge.getSourceSet());
+                predecessors.add(edge.getSource());
             }
         }
         return predecessors;
@@ -107,51 +72,32 @@ public class Linkage {
 
     public Set<Vertex> getPredecessors(Vertex vertex) {
         Set<Vertex> predecessors = new HashSet<>();
-        for (Hyperedge edge : getInEdges(vertex)) {
-            predecessors.addAll(edge.getSourceSet());
+        for (Edge edge : getInEdges(vertex)) {
+            predecessors.add(edge.getSource());
         }
         return predecessors;
     }
 
     public Collection<Vertex> getSuccessors(Vertex vertex) {
         Set<Vertex> successors = new HashSet<>();
-        for (Hyperedge edge : getOutEdges(vertex)) {
+        for (Edge edge : getOutEdges(vertex)) {
             successors.add(edge.getTarget());
         }
         return successors;
-    }
-
-    public int getVertexCount() {
-        return vertices.size();
     }
 
     public Set<Vertex> getVertices() {
         return vertices;
     }
 
-    public Set<Hyperedge> getEdges() {
+    public Set<Edge> getEdges() {
         return edges;
     }
 
-    public Set<Hyperedge> findEdge(Vertex from, Vertex to, Hyperedge.Partition partition) {
-        return edges.stream().filter(e ->
-                e.getPartition() == partition &&
-                        e.getSourceSet().contains(from) &&
-                        e.getTarget().equals(to)
-        ).collect(Collectors.toSet());
-    }
-
-    public Set<Hyperedge> findEdge(Set<Vertex> from, Vertex to, Hyperedge.Partition partition) {
-        return edges.stream().filter(e ->
-                e.getPartition() == partition &&
-                        e.getSourceSet().containsAll(from) &&
-                        e.getSourceSet().size() == from.size() &&
-                        e.getTarget().equals(to)
-        ).collect(Collectors.toSet());
-    }
-
-    public boolean containsEdge(Hyperedge edge) {
-        return edges.contains(edge);
+    public Set<Edge> findEdge(Vertex from, Vertex to, Edge.Partition partition) {
+        return edges.stream()
+                .filter(e -> e.getPartition() == partition && e.getSource() == from && e.getTarget() == to)
+                .collect(Collectors.toSet());
     }
 
     public Linkage copy() {
@@ -159,11 +105,8 @@ public class Linkage {
         for (Vertex vertex : vertices) {
             copy.addVertex(vertex);
         }
-        for (Hyperedge edge : getLambekEdges()) {
-            copy.addLambekEdge(edge.getSourceSet(), edge.getTarget(), edge.getPartition());
-        }
-        for (Hyperedge edge : getRegularEdges()) {
-            copy.addRegularEdge(edge.getSource(), edge.getTarget(), edge.getPartition());
+        for (Edge edge : getEdges()) {
+            copy.addEdge(edge.getSource(), edge.getTarget(), edge.getPartition(), edge.getType());
         }
         return copy;
     }
@@ -173,8 +116,7 @@ public class Linkage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Linkage linkage = (Linkage) o;
-        return Objects.equals(vertices, linkage.vertices) &&
-                Objects.equals(edges, linkage.edges);
+        return Objects.equals(vertices, linkage.vertices) && Objects.equals(edges, linkage.edges);
     }
 
     @Override
@@ -185,8 +127,8 @@ public class Linkage {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Hyperedge hyperedge : edges) {
-            sb.append(hyperedge.toString());
+        for (Edge edge : edges) {
+            sb.append(edge.toString());
             sb.append('\n');
         }
         return sb.toString();

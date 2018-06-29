@@ -2,8 +2,6 @@ package ru.eventflow.lcg.parser;
 
 import ru.eventflow.lcg.dto.ParseDTO;
 import ru.eventflow.lcg.frame.*;
-import ru.eventflow.lcg.sequent.Sequent;
-import ru.eventflow.lcg.validate.LinkageValidator;
 
 import java.util.*;
 
@@ -18,8 +16,10 @@ public class ChartLCGParser implements LCGParser {
     private Map<Key, Set<Item>> chart;
     private Frame frame;
     private OutputBuilder outputBuilder = new OutputBuilder();
+    private boolean verbose;
 
-    public ChartLCGParser() {
+    public ChartLCGParser(boolean verbose) {
+        this.verbose = verbose;
     }
 
     public ParseDTO parse(Sequent sequent) {
@@ -30,9 +30,9 @@ public class ChartLCGParser implements LCGParser {
 
         // prepare length one entries
         for (int i = 0; i < size - 1; i++) {
-            Hyperedge edge = attemptLink(i, i + 1);
+            Edge edge = attemptLink(i, i + 1);
             if (edge != null) {
-                put(new Item(i, i + 1, frame.getLinkage(), edge));
+                put(new Item(i, i + 1, edge, frame.getLinkage()));
             }
         }
 
@@ -45,7 +45,7 @@ public class ChartLCGParser implements LCGParser {
                 Set<Item> addition = new HashSet<>();
                 for (Item item : items) {
                     if (item.i > 0 && item.j < size - 1) {
-                        Hyperedge edge = attemptLink(item.i - 1, item.j + 1);
+                        Edge edge = attemptLink(item.i - 1, item.j + 1);
                         if (edge != null) {
                             addition.add(new Item(item.i - 1, item.j + 1, edge, Arrays.asList(item)));
                         }
@@ -79,7 +79,10 @@ public class ChartLCGParser implements LCGParser {
         }
 
         Set<Item> results = get(0, size - 1);
-        System.out.println("DEBUG: results size = " + results.size());
+
+        if (verbose) {
+            System.out.println("DEBUG: results size = " + results.size());
+        }
 
         // we have spurious ambiguity in the result set, so now we'll need to dedup. I do stupid things here. TODO do not.
         Set<Item> deduped = new TreeSet<>(new Comparator<Item>() {
@@ -96,15 +99,19 @@ public class ChartLCGParser implements LCGParser {
             }
         });
         deduped.addAll(results);
-        System.out.println("DEBUG: deduped size = " + deduped.size());
+        if (verbose) {
+            System.out.println("DEBUG: deduped size = " + deduped.size());
+        }
 
         Set<Linkage> integral = new HashSet<>();
         for (Item item : deduped) {
             Linkage linkage = item.linkage;
-            LinkageValidator validator = new LinkageValidator(linkage);
+            Validator validator = new Validator(linkage, verbose, true);
             if (validator.isLIntegral()) {
-                System.out.println("DEBUG: integral");
                 integral.add(linkage);
+                if (verbose) {
+                    System.out.println("DEBUG: integral");
+                }
             }
         }
 
@@ -116,23 +123,23 @@ public class ChartLCGParser implements LCGParser {
     }
 
     private void put(Item item) {
-        LinkageValidator validator = new LinkageValidator(item.linkage, false);
+        Validator validator = new Validator(item.linkage, verbose, false);
         if (validator.isRegularAcyclic()) {
             chart.putIfAbsent(item.getKey(), new HashSet<>());
             chart.get(item.getKey()).add(item);
         }
     }
 
-    private Hyperedge attemptLink(int l, int r) {
+    private Edge attemptLink(int l, int r) {
         Vertex left = frame.getAxiom(l);
         Vertex right = frame.getAxiom(r);
 
         if (left.getCategory().equals(right.getCategory()) && left.getPolarity() != right.getPolarity()) {
             // a regular edge is from positive to negative
             if (left.getPolarity() == Polarity.POSITIVE) {
-                return new Hyperedge(left, right, Hyperedge.Partition.LINKAGE);
+                return new Edge(left, right, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
             } else {
-                return new Hyperedge(right, left, Hyperedge.Partition.LINKAGE);
+                return new Edge(right, left, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
             }
         } else {
             return null;
@@ -143,7 +150,7 @@ public class ChartLCGParser implements LCGParser {
         private int i;
         private int j;
 
-        public Key(int i, int j) {
+        Key(int i, int j) {
             this.i = i;
             this.j = j;
         }
@@ -167,39 +174,36 @@ public class ChartLCGParser implements LCGParser {
         }
     }
 
-    private class Item {
+    private static class Item {
         int i;
         int j;
         Linkage linkage;
 
-        public Item(int i, int j, Linkage linkage, Hyperedge edge) {
+        Item(int i, int j, Edge edge, Linkage linkage) {
             this.i = i;
             this.j = j;
             this.linkage = linkage.copy();
-            this.linkage.addRegularEdge(edge.getSource(), edge.getTarget(), Hyperedge.Partition.LINKAGE);
+            this.linkage.addEdge(edge.getSource(), edge.getTarget(), Edge.Partition.LINKAGE, Edge.Type.REGULAR);
         }
 
-        public Item(int i, int j, Hyperedge edge, List<Item> parents) {
+        Item(int i, int j, Edge edge, List<Item> parents) {
             this.i = i;
             this.j = j;
 
             linkage = new Linkage();
             for (Item parent : parents) {
                 Linkage l = parent.linkage;
-                for (Hyperedge e : l.getLambekEdges()) {
-                    linkage.addLambekEdge(e.getSourceSet(), e.getTarget(), e.getPartition());
-                }
-                for (Hyperedge e : l.getRegularEdges()) {
-                    linkage.addRegularEdge(e.getSource(), e.getTarget(), e.getPartition());
+                for (Edge e : l.getEdges()) {
+                    linkage.addEdge(e.getSource(), e.getTarget(), e.getPartition(), e.getType());
                 }
             }
 
             if (edge != null) {
-                this.linkage.addRegularEdge(edge.getSource(), edge.getTarget(), edge.getPartition());
+                this.linkage.addEdge(edge.getSource(), edge.getTarget(), edge.getPartition(), edge.getType());
             }
         }
 
-        public Key getKey() {
+        Key getKey() {
             return new Key(i, j);
         }
 

@@ -1,4 +1,4 @@
-package ru.eventflow.lcg.sequent;
+package ru.eventflow.lcg.parser;
 
 import ru.eventflow.lcg.category.Category;
 import ru.eventflow.lcg.category.CategoryParser;

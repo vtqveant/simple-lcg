@@ -1,17 +1,17 @@
 package ru.eventflow.lcg.frame;
 
-import java.util.*;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A hyperedge in term graphs always has a single target vertex and one or more source vertices.
  */
-public class Hyperedge {
+public class Edge {
 
     private static AtomicInteger counter = new AtomicInteger();
 
     private final int id = counter.incrementAndGet();
-    private final Set<Vertex> sources;
+    private final Vertex source;
     private final Vertex target;
     private final Type type;
 
@@ -22,30 +22,15 @@ public class Hyperedge {
      */
     private final Partition partition;
 
-    public Hyperedge(Vertex source, Vertex target, Partition partition) {
-        this.sources = Collections.singleton(source);
+    public Edge(Vertex source, Vertex target, Partition partition, Edge.Type type) {
+        this.source = source;
         this.target = target;
-        this.type = Type.REGULAR;
-        this.partition = partition;
-    }
-
-    public Hyperedge(Set<Vertex> sources, Vertex target, Partition partition) {
-        this.sources = new HashSet<>(sources);
-        this.target = target;
-        this.type = Type.LAMBEK;
+        this.type = type;
         this.partition = partition;
     }
 
     public Vertex getSource() {
-        if (isLambek() && sources.size() != 1) {
-            throw new IllegalStateException("The source set of a Lambek edge is not a singleton.");
-        } else {
-            return sources.iterator().next();
-        }
-    }
-
-    public Set<Vertex> getSourceSet() {
-        return sources;
+        return source;
     }
 
     public boolean isRegular() {
@@ -64,19 +49,15 @@ public class Hyperedge {
         return partition;
     }
 
-    public int getId() {
-        return id;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Hyperedge hyperedge = (Hyperedge) o;
-        return id == hyperedge.id &&
-                Objects.equals(target, hyperedge.target) &&
-                type == hyperedge.type &&
-                partition == hyperedge.partition;
+        Edge edge = (Edge) o;
+        return id == edge.id &&
+                Objects.equals(target, edge.target) &&
+                type == edge.type &&
+                partition == edge.partition;
     }
 
     @Override
@@ -90,20 +71,7 @@ public class Hyperedge {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[{");
-        List<Vertex> vs = new ArrayList<>(sources);
-        for (int i = 0; i < sources.size(); i++) {
-            sb.append(vs.get(i).toString());
-            if (i < sources.size() - 1) {
-                sb.append(", ");
-            }
-        }
-        sb.append("}, ");
-        sb.append(target.toString());
-        sb.append("] ");
-        sb.append(type);
-        return sb.toString();
+        return "[" + source + ", " + target + "] " + type;
     }
 
     public enum Partition {FRAME, LINKAGE}

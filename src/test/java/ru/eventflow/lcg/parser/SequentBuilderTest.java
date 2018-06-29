@@ -1,4 +1,4 @@
-package ru.eventflow.lcg.sequent;
+package ru.eventflow.lcg.parser;
 
 import org.junit.Test;
 

@@ -11,8 +11,7 @@ src/**/dependency-reduced-pom.xml
 src/**/webapp/data
 
 target/
-tex/naaclhlt2018-latex/
-tex/data-natives
+dependency-reduced-pom.xml
 docs/
 workspace/
 data/

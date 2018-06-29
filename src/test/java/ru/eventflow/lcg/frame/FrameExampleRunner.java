@@ -1,7 +1,7 @@
 package ru.eventflow.lcg.frame;
 
-import ru.eventflow.lcg.sequent.Sequent;
-import ru.eventflow.lcg.sequent.SequentBuilder;
+import ru.eventflow.lcg.parser.Sequent;
+import ru.eventflow.lcg.parser.SequentBuilder;
 
 public class FrameExampleRunner {
 

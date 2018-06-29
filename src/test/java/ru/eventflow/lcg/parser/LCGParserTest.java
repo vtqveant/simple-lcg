@@ -6,8 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.eventflow.lcg.dto.ParseDTO;
-import ru.eventflow.lcg.sequent.Sequent;
-import ru.eventflow.lcg.sequent.SequentBuilder;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,7 +15,7 @@ public class LCGParserTest {
 
     @Before
     public void setUp() {
-        parser = new ChartLCGParser();
+        parser = new ChartLCGParser(true);
     }
 
     /**
@@ -319,7 +317,6 @@ public class LCGParserTest {
 
     /**
      * GMB derivations freely change N to NP when necessary, so I had to fix some of the categories to account for that.
-     * This is a simplified portion of the original sentence, because the original takes too long to be run along with other unit tests.
      */
     @Test
     public void testGMB_p00_d0030() {
@@ -334,7 +331,7 @@ public class LCGParserTest {
                 "NP/N[nom]", // the	DT	NP/N[nom]	the	O
                 "N[nom]/N[nom]", // palace	NN	N[nom]/N[nom]	palace	O
                 "N[nom]", // compound	NN	N[nom]	compound	O
-                "S[dcl]\\S[dcl]" // .	.	S[dcl]\S[dcl]	.	O        );
+                "S[dcl]\\S[dcl]" // .	.	S[dcl]\S[dcl]	.	O
         );
         builder.setSuccedent("S[dcl]");
         Sequent sequent = builder.build();

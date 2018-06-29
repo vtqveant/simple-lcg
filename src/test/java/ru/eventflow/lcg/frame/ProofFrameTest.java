@@ -3,9 +3,9 @@ package ru.eventflow.lcg.frame;
 import org.junit.Before;
 import org.junit.Test;
 import ru.eventflow.lcg.category.PrimitiveCategory;
-import ru.eventflow.lcg.sequent.Sequent;
-import ru.eventflow.lcg.sequent.SequentBuilder;
-import ru.eventflow.lcg.validate.LinkageValidator;
+import ru.eventflow.lcg.parser.Sequent;
+import ru.eventflow.lcg.parser.SequentBuilder;
+import ru.eventflow.lcg.parser.Validator;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -13,13 +13,13 @@ import static org.junit.Assert.assertTrue;
 public class ProofFrameTest {
 
     private ProofFrame proofFrame;
-    private LinkageValidator validator;
+    private Validator validator;
 
     @Before
     public void setUp() {
         Sequent sequent = SequentBuilder.builder().setAntecedent("S/(NP\\S)", "(NP\\S)/NP", "NP").setSuccedent("S").build(); // Who loves him
         proofFrame = ProofFrameBuilder.builder().setSequent(sequent).build();
-        validator = new LinkageValidator(proofFrame.getLinkage());
+        validator = new Validator(proofFrame.getLinkage(), true, true);
     }
 
     @Test
@@ -35,10 +35,10 @@ public class ProofFrameTest {
         Vertex v2 = new Vertex(new PrimitiveCategory("B"), Polarity.NEGATIVE);
         cyclic.addVertex(v1);
         cyclic.addVertex(v2);
-        cyclic.addRegularEdge(v1, v2, Hyperedge.Partition.LINKAGE);
-        cyclic.addRegularEdge(v2, v1, Hyperedge.Partition.LINKAGE);
+        cyclic.addEdge(v1, v2, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        cyclic.addEdge(v2, v1, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
 
-        boolean acyclic = new LinkageValidator(cyclic).isRegularAcyclic();
+        boolean acyclic = new Validator(cyclic, true, false).isRegularAcyclic();
         assertFalse(acyclic);
     }
 

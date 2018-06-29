@@ -1,9 +1,9 @@
-package ru.eventflow.lcg.validate;
+package ru.eventflow.lcg.parser;
 
 import org.junit.Before;
 import org.junit.Test;
 import ru.eventflow.lcg.category.PrimitiveCategory;
-import ru.eventflow.lcg.frame.Hyperedge;
+import ru.eventflow.lcg.frame.Edge;
 import ru.eventflow.lcg.frame.Linkage;
 import ru.eventflow.lcg.frame.Polarity;
 import ru.eventflow.lcg.frame.Vertex;
@@ -38,11 +38,11 @@ public class RegularReachabilityDetectorTest {
         linkage.addVertex(v2);
         linkage.addVertex(v3);
         linkage.addVertex(v4);
-        linkage.addRegularEdge(v1, v2, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v1, v3, Hyperedge.Partition.LINKAGE);
-        linkage.addRegularEdge(v3, v4, Hyperedge.Partition.LINKAGE);
+        linkage.addEdge(v1, v2, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v1, v3, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
+        linkage.addEdge(v3, v4, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
 
-        regularReachabilityDetector = new RegularReachabilityDetector(linkage);
+        regularReachabilityDetector = new RegularReachabilityDetector(linkage, true);
     }
 
     @Test

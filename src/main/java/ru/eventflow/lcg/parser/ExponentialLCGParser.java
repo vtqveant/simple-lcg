@@ -3,8 +3,6 @@ package ru.eventflow.lcg.parser;
 import ru.eventflow.lcg.category.PrimitiveCategory;
 import ru.eventflow.lcg.dto.ParseDTO;
 import ru.eventflow.lcg.frame.*;
-import ru.eventflow.lcg.sequent.Sequent;
-import ru.eventflow.lcg.validate.LinkageValidator;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -86,11 +84,8 @@ public class ExponentialLCGParser implements LCGParser {
 
         // add edges from the frame and validate
         for (Linkage linkage : complete) {
-            for (Hyperedge edge : frame.getLinkage().getLambekEdges()) {
-                linkage.addLambekEdge(edge.getSourceSet(), edge.getTarget(), edge.getPartition());
-            }
-            for (Hyperedge edge : frame.getLinkage().getRegularEdges()) {
-                linkage.addRegularEdge(edge.getSource(), edge.getTarget(), edge.getPartition());
+            for (Edge edge : frame.getLinkage().getEdges()) {
+                linkage.addEdge(edge.getSource(), edge.getTarget(), edge.getPartition(), edge.getType());
             }
         }
 
@@ -99,7 +94,7 @@ public class ExponentialLCGParser implements LCGParser {
         Set<Linkage> integral = new HashSet<>();
 
         for (Linkage linkage : complete) {
-            LinkageValidator validator = new LinkageValidator(linkage);
+            Validator validator = new Validator(linkage, true, true);
             if (validator.isLIntegral()) {
                 System.out.println("DEBUG: integral");
                 integral.add(linkage);
@@ -156,9 +151,9 @@ public class ExponentialLCGParser implements LCGParser {
 
             // a regular edge is from positive to negative
             if (left.getPolarity() == Polarity.POSITIVE) {
-                copy.addRegularEdge(left, right, Hyperedge.Partition.LINKAGE);
+                copy.addEdge(left, right, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
             } else {
-                copy.addRegularEdge(right, left, Hyperedge.Partition.LINKAGE);
+                copy.addEdge(right, left, Edge.Partition.LINKAGE, Edge.Type.REGULAR);
             }
             return copy;
         } else {

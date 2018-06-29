@@ -2,18 +2,15 @@ package ru.eventflow.lcg.parser;
 
 import ru.eventflow.lcg.category.Category;
 import ru.eventflow.lcg.dto.*;
-import ru.eventflow.lcg.frame.Hyperedge;
+import ru.eventflow.lcg.frame.Edge;
 import ru.eventflow.lcg.frame.Linkage;
 import ru.eventflow.lcg.frame.Vertex;
-import ru.eventflow.lcg.sequent.Sequent;
 
 import java.util.*;
 
 public class OutputBuilder {
 
     public ParseDTO build(Sequent sequent, Set<Linkage> linkages, List<Vertex> order) {
-
-        System.out.println("DEBUG: " + linkages.size());
 
         Map<Integer, Integer> indices = new HashMap<>();
 
@@ -33,12 +30,12 @@ public class OutputBuilder {
         List<LinkageDTO> ls = new ArrayList<>();
         for (Linkage linkage : linkages) {
 
-            List<Hyperedge> orderedEdges = new ArrayList<>(linkage.getEdges());
+            List<Edge> orderedEdges = new ArrayList<>(linkage.getEdges());
             orderedEdges.sort(Comparator.comparingInt(value -> value.getSource().getId()));
             orderedEdges.sort(Comparator.comparingInt(value -> value.getTarget().getId()));
 
             List<LinkDTO> links = new ArrayList<>();
-            for (Hyperedge e : orderedEdges) {
+            for (Edge e : orderedEdges) {
                 Vertex source = e.getSource();
                 Vertex target = e.getTarget();
                 links.add(new LinkDTO(indices.get(source.getId()), indices.get(target.getId()), e.getPartition().name().toLowerCase(), e.getType().name().toLowerCase()));

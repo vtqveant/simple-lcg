@@ -34,7 +34,7 @@ representation of the sequent. An output is a term graph serialized as JSON.
 
 ```
 
-A CLI runner will be provided soon. 
+A CLI runner can be built by running `$ mvn clean package` and invoked as `java -jar simple-lcg.jar -a A/B,B/C -s A/C -v`.
 
 
 ### Definitions, data structures and algorithms described in (Fowler 2016)
