@@ -86,7 +86,7 @@ During implementation I found a number of places in the Fowler's thesis which pu
 to make it work the way I would expect a regular categorial grammar to work. In the end I decided that an important
 element was missing from Fowler's definition of an L-integral term graph. Namely, in the `T(CT)` part I had to add an
 explicit check that the `t` node be reachable from `x`, which in my opinion complies with the definition of correctness
-conditions for LG-graphs by (Penn 2004). Apart from that I also prohibit one-step regular paths between sources and
+conditions for LC-graphs by (Penn 2004). Apart from that I also prohibit one-step regular paths between sources and
 targets of lambek edges where the source has an incoming regular edge in the frame, which effectively rules out
 the derivations violating a side-condition of a non-empty antecedent in the right-hand side introduction rules.
 The resulting system is a product-free `L` without empty premises (although I give here no formal proofs of that).
@@ -100,7 +100,7 @@ parser is nonetheless quite efficient and much simpler than the original parser 
 ### Errata
 
 * In the `T(CT)` validation rule I had to add an additional requirement that `t` is regular reachable from `x`, 
-  which seems compatible with the original LG-graphs definition from (Penn 2004). 
+  which seems compatible with the original LC-graphs definition from (Penn 2004). 
 * On p. 77, Fig. 3.14(b) a link between `N2` and `S4` is not eligible, should not the first category of the antecedent
   rather be `S1\(N2/N3)` instead of `S1/(N2/N3)`?
 * On p. 153 the categories of 'by' and of its parent in the trees are swapped.

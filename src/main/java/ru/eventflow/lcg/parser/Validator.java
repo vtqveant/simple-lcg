@@ -42,7 +42,7 @@ public class Validator {
         // there is a regular path from s to x and there is no Lambek edge (s2, x) such that
         // there is a regular path from s to s2.
         // IMPORTANT: I had to add to that rule an additional requirement that t is regular reachable from x, which seems
-        // compatible with the original LG-graphs definition from (Penn 2004)
+        // compatible with the original LC-graphs definition from (Penn 2004)
         for (Edge s_t : linkage.getLambekEdges()) {
             Vertex s = s_t.getSource();
             Vertex t = s_t.getTarget();
