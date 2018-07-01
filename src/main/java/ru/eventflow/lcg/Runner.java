@@ -37,7 +37,7 @@ public class Runner {
                 formatter.printHelp("simple-lcg", options);
             }
         } catch (ParseException e) {
-            System.out.println("Unexpected exception:" + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 

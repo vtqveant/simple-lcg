@@ -85,7 +85,7 @@ the whole procedure is deterministic, the logical properties of the system are e
 During implementation I found a number of places in the Fowler's thesis which puzzled me, and I struggled somewhat
 to make it work the way I would expect a regular categorial grammar to work. In the end I decided that an important
 element was missing from Fowler's definition of an L-integral term graph. Namely, in the `T(CT)` part I had to add an
-explicit check that the t node be reachable from x, which in my opinion complies with the definition of correctness
+explicit check that the `t` node be reachable from `x`, which in my opinion complies with the definition of correctness
 conditions for LG-graphs by (Penn 2004). Apart from that I also prohibit one-step regular paths between sources and
 targets of lambek edges where the source has an incoming regular edge in the frame, which effectively rules out
 the derivations violating a side-condition of a non-empty antecedent in the right-hand side introduction rules.
@@ -104,6 +104,11 @@ parser is nonetheless quite efficient and much simpler than the original parser 
 * On p. 77, Fig. 3.14(b) a link between `N2` and `S4` is not eligible, should not the first category of the antecedent
   rather be `S1\(N2/N3)` instead of `S1/(N2/N3)`?
 * On p. 153 the categories of 'by' and of its parent in the trees are swapped.
+
+### References
+
+* Penn, G. (2004). A Graph-Theoretic Approach to Sequent Derivability in the Lambek Calculus.
+* Fowler, T. A. D. (2016). Lambek Categorial Grammars for Practical Parsing (Doctoral dissertation).
 
 
 ### License
