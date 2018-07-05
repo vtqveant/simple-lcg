@@ -15,6 +15,9 @@ public class ParseDTO {
     @JsonProperty("parses")
     private List<LinkageDTO> parses;
 
+    public ParseDTO() {
+    }
+
     public ParseDTO(SequentDTO sequent, List<CategoryDTO> categories, List<LinkageDTO> parses) {
         this.sequent = sequent;
         this.categories = categories;

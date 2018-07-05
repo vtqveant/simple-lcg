@@ -6,9 +6,16 @@ import java.util.List;
 
 public class LinkageDTO {
     @JsonProperty("l")
-    List<LinkDTO> links;
+    private List<LinkDTO> links;
+
+    public LinkageDTO() {
+    }
 
     public LinkageDTO(List<LinkDTO> links) {
         this.links = links;
+    }
+
+    public List<LinkDTO> getLinks() {
+        return links;
     }
 }

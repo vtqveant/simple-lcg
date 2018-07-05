@@ -10,9 +10,19 @@ public class SequentDTO {
     @JsonProperty
     String succedent;
 
+    public SequentDTO() {
+    }
+
     public SequentDTO(String antecedent, String succedent) {
         this.antecedent = antecedent;
         this.succedent = succedent;
     }
 
+    public String getAntecedent() {
+        return antecedent;
+    }
+
+    public String getSuccedent() {
+        return succedent;
+    }
 }
